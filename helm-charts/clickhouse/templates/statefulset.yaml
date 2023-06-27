@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "clickhouse.name" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "clickhouse.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  namespace: {{ .Values.namespace }}
+spec:
+  serviceName: "clickhouse-statefulset"
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "clickhouse.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+    updateStrategy:
+      type: {{ .Values.clickhouse.deployment.updateStrategy.type }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "clickhouse.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }} 
+    spec:
+      containers:
+        - name: {{ .Values.clickhouse.statefulset.name }}
+          image: "{{ .Values.clickhouse.statefulset.spec.image.repository }}:{{ .Values.clickhouse.statefulset.spec.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.clickhouse.deployment.ports.port1 }}
+            - containerPort: {{ .Values.clickhouse.deployment.ports.port2 }}
+            - containerPort: {{ .Values.clickhouse.deployment.ports.port3 }}
+          env:
+            - name: CLICKHOUSE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "clickhouse.name" . }}
+                  key: CLICKHOUSE_USER
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "clickhouse.name" . }}
+                  key: CLICKHOUSE_PASSWORD
+            - name: CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "clickhouse.name" . }}
+                  key: CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT
+          volumeMounts:
+            - name: {{ .Values.clickhouse.statefulset.spec.volumeMounts.name }}
+              mountPath: {{ .Values.clickhouse.statefulset.spec.volumeMounts.mountPath }}
+      volumes:
+        - name: {{ .Values.clickhouse.statefulset.spec.volumes.name }}
+          hostPath:
+            path: {{ .Values.clickhouse.statefulset.spec.volumes.hostPath.path }}
+            type: DirectoryOrCreate
