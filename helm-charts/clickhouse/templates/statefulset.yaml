@@ -1,3 +1,4 @@
+{{- if .Values.clickhouse.statefulset.enabled }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -13,8 +14,8 @@ spec:
     matchLabels:
       app.kubernetes.io/name: {{ include "clickhouse.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
-    updateStrategy:
-      type: {{ .Values.clickhouse.deployment.updateStrategy.type }}
+  updateStrategy:
+    type: {{ .Values.clickhouse.statefulset.spec.updateStrategy.type }}
   template:
     metadata:
       labels:
@@ -25,9 +26,9 @@ spec:
         - name: {{ .Values.clickhouse.statefulset.name }}
           image: "{{ .Values.clickhouse.statefulset.spec.image.repository }}:{{ .Values.clickhouse.statefulset.spec.image.tag }}"
           ports:
-            - containerPort: {{ .Values.clickhouse.deployment.ports.port1 }}
-            - containerPort: {{ .Values.clickhouse.deployment.ports.port2 }}
-            - containerPort: {{ .Values.clickhouse.deployment.ports.port3 }}
+            - containerPort: {{ .Values.clickhouse.statefulset.spec.ports.port1 }}
+            - containerPort: {{ .Values.clickhouse.statefulset.spec.ports.port2 }}
+            - containerPort: {{ .Values.clickhouse.statefulset.spec.ports.port3 }}
           env:
             - name: CLICKHOUSE_USER
               valueFrom:
@@ -52,3 +53,4 @@ spec:
           hostPath:
             path: {{ .Values.clickhouse.statefulset.spec.volumes.hostPath.path }}
             type: DirectoryOrCreate
+{{- end }}
