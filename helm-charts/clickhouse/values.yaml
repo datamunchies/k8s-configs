@@ -60,6 +60,19 @@ clickhouse:
         port3: 9009
       updateStrategy:
         type: RollingUpdate
+      readinessProbe:
+        enabled: true
+        exec:
+          command:
+          - ./readinessProbe.sh
+        initialDelaySeconds: 5
+      livenessProbe:
+        enabled: true
+        exec:
+          command:
+          - ./livenessProbe.sh
+        initialDelaySeconds: 10
+        periodSeconds: 60
       volumeMounts: 
         name: clickhouse-volume
         mountPath: /var/lib/clickhouse

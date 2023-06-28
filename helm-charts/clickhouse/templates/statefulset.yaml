@@ -29,6 +29,15 @@ spec:
             - containerPort: {{ .Values.clickhouse.statefulset.spec.ports.port1 }}
             - containerPort: {{ .Values.clickhouse.statefulset.spec.ports.port2 }}
             - containerPort: {{ .Values.clickhouse.statefulset.spec.ports.port3 }}
+          readinessProbe:
+            exec:
+              command: {{ .Values.clickhouse.statefulset.spec.readinessProbe.exec.command }}
+            initialDelaySeconds: {{ .Values.clickhouse.statefulset.spec.readinessProbe.initialDelaySeconds }}
+          livenessProbe:
+            exec:
+              command: {{ .Values.clickhouse.statefulset.spec.livenessProbe.exec.command }}
+            initialDelaySeconds: {{ .Values.clickhouse.statefulset.spec.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.clickhouse.statefulset.spec.livenessProbe.periodSeconds }}
           env:
             - name: CLICKHOUSE_USER
               valueFrom:
