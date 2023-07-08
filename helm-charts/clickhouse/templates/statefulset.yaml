@@ -1,4 +1,4 @@
-{{- if .Values.clickhouse.statefulset.enabled }}
+{{- if .Values.statefulset.enabled }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -10,37 +10,41 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   serviceName: "clickhouse-statefulset"
+  replicas: {{ .Values.statefulset.spec.replicas }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "clickhouse.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   updateStrategy:
-    type: {{ .Values.clickhouse.statefulset.spec.updateStrategy.type }}
+    type: {{ .Values.statefulset.spec.updateStrategy.type }}
   template:
     metadata:
       labels:
         app.kubernetes.io/name: {{ include "clickhouse.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }} 
     spec:
+      {{- if .Values.serviceAccount.enabled }}
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      {{- end }}
       containers:
-        - name: {{ .Values.clickhouse.statefulset.name }}
-          image: "{{ .Values.clickhouse.statefulset.spec.image.repository }}:{{ .Values.clickhouse.statefulset.spec.image.tag }}"
+        - name: {{ .Values.statefulset.name }}
+          image: "{{ .Values.statefulset.spec.image.repository }}:{{ .Values.statefulset.spec.image.tag }}"
           ports:
-            - containerPort: {{ .Values.clickhouse.statefulset.spec.ports.port1 }}
-            - containerPort: {{ .Values.clickhouse.statefulset.spec.ports.port2 }}
-            - containerPort: {{ .Values.clickhouse.statefulset.spec.ports.port3 }}
-          {{- if .Values.clickhouse.statefulset.spec.readinessProbe.enabled }}
+            - containerPort: {{ .Values.statefulset.spec.ports.port1 }}
+            - containerPort: {{ .Values.statefulset.spec.ports.port2 }}
+            - containerPort: {{ .Values.statefulset.spec.ports.port3 }}
+          {{- if .Values.statefulset.spec.readinessProbe.enabled }}
           readinessProbe:
             exec:
-              command: {{ .Values.clickhouse.statefulset.spec.readinessProbe.exec.command }}
-            initialDelaySeconds: {{ .Values.clickhouse.statefulset.spec.readinessProbe.initialDelaySeconds }}
+              command: {{ .Values.statefulset.spec.readinessProbe.exec.command }}
+            initialDelaySeconds: {{ .Values.statefulset.spec.readinessProbe.initialDelaySeconds }}
           {{- end }}
-          {{- if .Values.clickhouse.statefulset.spec.livenessProbe.enabled }}
+          {{- if .Values.statefulset.spec.livenessProbe.enabled }}
           livenessProbe:
             exec:
-              command: {{ .Values.clickhouse.statefulset.spec.livenessProbe.exec.command }}
-            initialDelaySeconds: {{ .Values.clickhouse.statefulset.spec.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.clickhouse.statefulset.spec.livenessProbe.periodSeconds }}
+              command: {{ .Values.statefulset.spec.livenessProbe.exec.command }}
+            initialDelaySeconds: {{ .Values.statefulset.spec.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.statefulset.spec.livenessProbe.periodSeconds }}
           {{- end }}
           env:
             - name: CLICKHOUSE_USER
@@ -59,11 +63,11 @@ spec:
                   name: {{ include "clickhouse.name" . }}
                   key: CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT
           volumeMounts:
-            - name: {{ .Values.clickhouse.statefulset.spec.volumeMounts.name }}
-              mountPath: {{ .Values.clickhouse.statefulset.spec.volumeMounts.mountPath }}
+            - name: {{ .Values.statefulset.spec.volumeMounts.name }}
+              mountPath: {{ .Values.statefulset.spec.volumeMounts.mountPath }}
       volumes:
-        - name: {{ .Values.clickhouse.statefulset.spec.volumes.name }}
+        - name: {{ .Values.statefulset.spec.volumes.name }}
           hostPath:
-            path: {{ .Values.clickhouse.statefulset.spec.volumes.hostPath.path }}
+            path: {{ .Values.statefulset.spec.volumes.hostPath.path }}
             type: DirectoryOrCreate
 {{- end }}

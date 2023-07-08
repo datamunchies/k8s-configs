@@ -1,4 +1,4 @@
-{{- if .Values.clickhouse.service.enabled }}
+{{- if .Values.service.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -10,15 +10,15 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   selector:
-    #app: {{ .Values.clickhouse.deployment.name }}
+    #app: {{ .Values.deployment.name }}
     app.kubernetes.io/name: {{ include "clickhouse.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
   ports:
-    - name: {{ .Values.clickhouse.service.ports.http.name }}
-      port: {{ .Values.clickhouse.service.ports.http.port }}
-      targetPort: {{ .Values.clickhouse.service.ports.http.targetPort }}
-    - name: {{ .Values.clickhouse.service.ports.tcp.name }}
-      port: {{ .Values.clickhouse.service.ports.tcp.port }}
-      targetPort: {{ .Values.clickhouse.service.ports.tcp.targetPort }}
-  type: {{ .Values.clickhouse.service.type }}
+    - name: {{ .Values.service.ports.http.name }}
+      port: {{ .Values.service.ports.http.port }}
+      targetPort: {{ .Values.service.ports.http.targetPort }}
+    - name: {{ .Values.service.ports.tcp.name }}
+      port: {{ .Values.service.ports.tcp.port }}
+      targetPort: {{ .Values.service.ports.tcp.targetPort }}
+  type: {{ .Values.service.type }}
 {{- end }}
