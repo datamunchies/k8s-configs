@@ -6,15 +6,15 @@ metadata:
     app.kubernetes.io/name: {{ include "dbt.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    owner: {{ .Values.dbt.deployment.metadata.labels.owner | toString }}
-    app.kubernetes.io/component: {{ .Values.dbt.deployment.metadata.labels.component | toString }}
-    app.kubernetes.io/part-of: {{ .Values.dbt.deployment.metadata.labels.part_of | toString }}
+    owner: {{ .Values.deployment.metadata.labels.owner | toString }}
+    app.kubernetes.io/component: {{ .Values.deployment.metadata.labels.component | toString }}
+    app.kubernetes.io/part-of: {{ .Values.deployment.metadata.labels.part_of | toString }}
   namespace: {{ .Values.namespace }}
 spec:
   selector:
     app.kubernetes.io/name: {{ include "dbt.name" . }}
   ports:
-    - name: {{ .Values.dbt.service.ports.http.name }}
-      port: {{ .Values.dbt.service.ports.http.port }}
-      targetPort: {{ .Values.dbt.service.ports.http.targetPort }}
-  type: {{ .Values.dbt.service.type }}
+    - name: {{ .Values.service.ports.http.name }}
+      port: {{ .Values.service.ports.http.port }}
+      targetPort: {{ .Values.service.ports.http.targetPort }}
+  type: {{ .Values.service.type }}
