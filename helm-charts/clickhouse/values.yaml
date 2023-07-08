@@ -1,82 +1,92 @@
 namespace: dev
 
+serviceAccountName: &service-account-name "clickhouse-server-sa"
+
+serviceAccount:
+  enabled: true
+  create: true
+  annotations: {}
+  name: *service-account-name
+
+
 # clickhouse deployment configuration
-clickhouse:
-  deployment:
-    enabled: false
-    name: clickhouse
-    # replicas is the number of pods to create
+
+deployment:
+  enabled: false
+  name: clickhouse
+  # replicas is the number of pods to create
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    maxSurge: 3
+  updateStrategy:
+    type: RollingUpdate
+  image: 
+    # repository is the name of the repository on dockerhub
+    repository: slowsunday/clickhouse
+    tag: latest
+  # ports represents default ports for clickhouse server, http:8123, tcp:9000;9009  
+  ports:
+    port1: 8123
+    port2: 9000
+    port3: 9009
+  secret: clickhouse-secret
+
+  # configmap configuration
+configmap:
+  enabled: true
+  name: clickhouse-config
+  # svcHost is a hostname of the server, on minikube defaults to 127.0.0.1
+  svcHost: host.minikube.internal
+  # port is the port number attached to the svcHost, the above would be equal to http://127.0.0.1:8123
+  port: "8123"
+  secret: ''
+
+  # Service configuration
+service:
+  enabled: true
+  type: ClusterIP
+  ports:
+    http:
+      name: http
+      port: 8123
+      targetPort: 8123
+    tcp:
+      name: tcp
+      port: 9000
+      targetPort: 9000
+      
+statefulset:
+  enabled: true
+  name: clickhouse
+  spec:
     replicas: 1
-    strategy:
-      type: RollingUpdate
-      maxSurge: 3
-    updateStrategy:
-      type: RollingUpdate
     image: 
-      # repository is the name of the repository on dockerhub
       repository: slowsunday/clickhouse
       tag: latest
-    # ports represents default ports for clickhouse server, http:8123, tcp:9000;9009  
     ports:
       port1: 8123
       port2: 9000
       port3: 9009
-    secret: clickhouse-secret
-
-  # configmap configuration
-  configmap:
-    enabled: true
-    name: clickhouse-config
-    # svcHost is a hostname of the server, on minikube defaults to 127.0.0.1
-    svcHost: host.minikube.internal
-    # port is the port number attached to the svcHost, the above would be equal to http://127.0.0.1:8123
-    port: "8123"
-    secret: ''
-
-  # Service configuration
-  service:
-    enabled: true
-    type: ClusterIP
-    ports:
-      http:
-        name: http
-        port: 8123
-        targetPort: 8123
-      tcp:
-        name: tcp
-        port: 9000
-        targetPort: 9000
-        
-  statefulset:
-    enabled: true
-    name: clickhouse
-    spec:
-      image: 
-        repository: slowsunday/clickhouse
-        tag: latest
-      ports:
-        port1: 8123
-        port2: 9000
-        port3: 9009
-      updateStrategy:
-        type: RollingUpdate
-      readinessProbe:
-        enabled: true
-        exec:
-          command:
-          - ./readinessProbe.sh
-        initialDelaySeconds: 5
-      livenessProbe:
-        enabled: true
-        exec:
-          command:
-          - ./livenessProbe.sh
-        initialDelaySeconds: 10
-        periodSeconds: 60
-      volumeMounts: 
-        name: clickhouse-volume
-        mountPath: /var/lib/clickhouse
-      volumes:
-        name: clickhouse-volume
-        hostPath:
-          path: "/Users/x/clickhouse-data"
+    updateStrategy:
+      type: RollingUpdate
+    readinessProbe:
+      enabled: true
+      exec:
+        command:
+        - ./readinessProbe.sh
+      initialDelaySeconds: 5
+    livenessProbe:
+      enabled: true
+      exec:
+        command:
+        - ./livenessProbe.sh
+      initialDelaySeconds: 10
+      periodSeconds: 60
+    volumeMounts: 
+      name: clickhouse-volume
+      mountPath: /var/lib/clickhouse
+    volumes:
+      name: clickhouse-volume
+      hostPath:
+        path: "/Users/x/clickhouse-data"

@@ -1,4 +1,4 @@
-{{- if .Values.clickhouse.deployment.enabled }}
+{{- if .Values.deployment.enabled }}
  apiVersion: apps/v1
  kind: Deployment
  metadata:
@@ -10,26 +10,26 @@
      app.kubernetes.io/instance: {{ .Release.Name }}
      app.kubernetes.io/managed-by: {{ .Release.Service }}
  spec:
-   replicas: {{ .Values.clickhouse.deployment.replicas }}
+   replicas: {{ .Values.deployment.replicas }}
    selector:
      matchLabels:
        #app: {{ .Values.clickhouse.deployment.name }}
        app.kubernetes.io/name: {{ include "clickhouse.name" . }}
        app.kubernetes.io/instance: {{ .Release.Name }}
    strategy:
-     type: {{ .Values.clickhouse.deployment.strategy.type }}
+     type: {{ .Values.deployment.strategy.type }}
      rollingUpdate:
-       maxSurge: {{ .Values.clickhouse.deployment.strategy.maxSurge }}
+       maxSurge: {{ .Values.deployment.strategy.maxSurge }}
    template:
      metadata:
        labels:
-         #app: {{ .Values.clickhouse.deployment.name }}
+         #app: {{ .Values.deployment.name }}
          app.kubernetes.io/name: {{ include "clickhouse.name" . }}
          app.kubernetes.io/instance: {{ .Release.Name }}
      spec:
        containers:
        - name: {{ include "clickhouse.name" . }}
-         image: "{{ .Values.clickhouse.deployment.image.repository }}:{{ .Values.clickhouse.deployment.image.tag }}"
+         image: "{{ .Values.deployment.image.repository }}:{{ .Values.deployment.image.tag }}"
          env:
            - name: CLICKHOUSE_USER
              valueFrom:
@@ -47,7 +47,7 @@
                  name: {{ include "clickhouse.name" .}}
                  key: CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT
          ports:
-         - containerPort: {{ .Values.clickhouse.deployment.ports.port1 }}
-         - containerPort: {{ .Values.clickhouse.deployment.ports.port2 }}
-         - containerPort: {{ .Values.clickhouse.deployment.ports.port3 }}
+         - containerPort: {{ .Values.deployment.ports.port1 }}
+         - containerPort: {{ .Values.deployment.ports.port2 }}
+         - containerPort: {{ .Values.deployment.ports.port3 }}
 {{- end }}
